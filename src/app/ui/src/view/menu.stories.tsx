@@ -1,4 +1,5 @@
-import m from "mithril"; // eslint-disable-line no-unused-vars
+import React from "react";
+import { storiesOf } from "@storybook/react";
 import { withKnobs } from "@storybook/addon-knobs";
 import { withA11y } from "@storybook/addon-a11y";
 import Menu from "./menu";
@@ -10,6 +11,7 @@ export default {
   decorators: [withKnobs, withA11y],
 };
 
-export const menu = () => ({
-  view: () => <Menu />,
-});
+storiesOf("Component/Menu", module)
+  .addDecorator(withKnobs)
+  .addDecorator(withA11y)
+  .add("Menu", () => <Menu />);
