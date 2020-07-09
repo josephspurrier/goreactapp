@@ -11,11 +11,13 @@ module.exports = {
         'plugin:prettier/recommended',
         'plugin:@typescript-eslint/eslint-recommended',
         'plugin:@typescript-eslint/recommended',
-        'plugin:mithril/recommended'
+        'plugin:react/recommended',
     ],
     plugins: [
         'prettier',
         '@typescript-eslint'
     ],
-    rules: {}
+    rules: {
+        "react/prop-types": 1,
+    }
 }

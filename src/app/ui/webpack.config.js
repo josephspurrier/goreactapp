@@ -9,12 +9,12 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ASSET_PATH = process.env.ASSET_PATH || "/";
 
 module.exports = {
-  entry: "./src/index.ts",
+  entry: "./src/index.tsx",
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       filename: "./index.html",
-      title: "gomithrilapp",
+      template: "./template.html",
     }),
     new MiniCssExtractPlugin({
       filename: "static/[name].[contenthash].css",
@@ -44,6 +44,8 @@ module.exports = {
       chunks: "all",
     },
   },
+  // Enable sourcemaps for debugging webpack's output.
+  devtool: "source-map",
   performance: {
     hints: false,
   },
@@ -65,6 +67,12 @@ module.exports = {
         exclude: /node_modules/,
         loader: "babel-loader",
       },
+      // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+      {
+        enforce: "pre",
+        test: /\.js$/,
+        loader: "source-map-loader",
+      },
       {
         test: /\.scss$/,
         use: [
@@ -82,4 +90,12 @@ module.exports = {
       },
     ],
   },
+  // When importing a module whose path matches one of the following, just
+  // assume a corresponding global variable exists and use that instead.
+  // This is important because it allows us to avoid bundling all of our
+  // dependencies, which allows browsers to cache those libraries between builds.
+  // externals: {
+  //   react: "React",
+  //   "react-dom": "ReactDOM",
+  // },
 };
