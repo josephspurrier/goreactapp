@@ -3,36 +3,27 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ErrorPage from "@/view/error";
-
-//import { Hello } from "@/Hello";
-
-console.log("React ready.");
-
-export interface HelloProps {
-  compiler: string;
-  framework: string;
-}
-
-class Page1 extends React.Component<HelloProps> {
-  render() {
-    return <h1>Page 1</h1>;
-  }
-}
-
-class Page2 extends React.Component<HelloProps> {
-  render() {
-    return <h1>Page 2</h1>;
-  }
-}
+import HomePage from "@/view/home";
+import AboutPage from "@/view/about";
+import MainLayout from "@/layout/main";
+import "~/style/main.scss";
 
 const Root = () => (
-  <Router>
-    <Switch>
-      <Route exact path="/" component={Page1} />
-      <Route exact path="/test" component={Page2} />
-      <Route path="*" component={ErrorPage} />
-    </Switch>
-  </Router>
+  <MainLayout>
+    <Router>
+      <Switch>
+        <Route exact path="/">
+          <HomePage />
+        </Route>
+        <Route exact path="/about">
+          <AboutPage />
+        </Route>
+        <Route path="*">
+          <ErrorPage title="Page Not Found" />
+        </Route>
+      </Switch>
+    </Router>
+  </MainLayout>
 );
 
 ReactDOM.render(<Root />, document.getElementById("app-root"));

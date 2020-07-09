@@ -1,18 +1,15 @@
-import m from "mithril"; // eslint-disable-line no-unused-vars
+import React from "react";
+import { storiesOf } from "@storybook/react";
 import { withKnobs, text, select } from "@storybook/addon-knobs";
 import { withA11y } from "@storybook/addon-a11y";
 import Input from "./input";
 import "~/style/main.scss";
 
-export default {
-  title: "Component/Input",
-  component: Input,
-  decorators: [withKnobs, withA11y],
-};
-
-export const input = () => ({
-  oninit: (vnode) => {
-    vnode.state.type = select(
+storiesOf("Component/Input", module)
+  .addDecorator(withKnobs)
+  .addDecorator(withA11y)
+  .add("Input", function () {
+    const type = select(
       "Type",
       {
         text: "text",
@@ -31,12 +28,14 @@ export const input = () => ({
       },
       "text"
     );
-  },
-  view: (vnode) => (
-    <Input
-      label="First Name"
-      value={text("Value", "John")}
-      type={vnode.state.type}
-    />
-  ),
-});
+
+    return (
+      <Input
+        label=""
+        name=""
+        type={type}
+        required={true}
+        value={text("Value", "John")}
+      />
+    );
+  });

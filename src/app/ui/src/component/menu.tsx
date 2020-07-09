@@ -17,9 +17,9 @@ function View(): JSX.Element {
         aria-label="main navigation"
       >
         <div className="navbar-brand">
-          <link className="navbar-item" href="/" data-cy="home-link">
+          <a className="navbar-item" href="/" data-cy="home-link">
             <strong>gomithrilapp</strong>
-          </link>
+          </a>
 
           <a
             id="mobile-navbar-top"
@@ -48,9 +48,9 @@ function View(): JSX.Element {
 
               <div className="navbar-dropdown is-right">
                 {!CookieStore.isLoggedIn() && (
-                  <link className="navbar-item" href="/login">
+                  <a className="navbar-item" href="/login">
                     Login
-                  </link>
+                  </a>
                 )}
                 <a
                   className="navbar-item"
@@ -58,9 +58,9 @@ function View(): JSX.Element {
                 >
                   Swagger
                 </a>
-                <link className="navbar-item" href="/about">
+                <a className="navbar-item" href="/about">
                   About
-                </link>
+                </a>
                 <hr className="navbar-divider" />
                 {CookieStore.isLoggedIn() && (
                   <a
