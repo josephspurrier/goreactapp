@@ -1,0 +1,27 @@
+version: "3.4"
+
+# Template.
+x-template: &service-template
+  restart: always
+  env_file:
+    - .env
+  networks:
+    - dnet
+
+# Network.
+networks:
+  dnet:
+    driver: bridge
+
+# Services.
+services:
+  db:
+    <<: *service-template
+    image: "${MYSQL_CONTAINER}"
+    ports:
+      - "3306:3306"
+  app:
+    <<: *service-template
+    image: "gomithrilapp:${APP_VERSION}"
+    ports:
+      - "80:80"
