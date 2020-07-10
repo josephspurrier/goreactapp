@@ -6,23 +6,22 @@ import ErrorPage from "@/view/error";
 import HomePage from "@/view/home";
 import AboutPage from "@/view/about";
 import MainLayout from "@/layout/main";
+import CookieStore from "@/module/cookiestore";
 import "~/style/main.scss";
 
 function Root() {
-  //if (CookieStore.isLoggedIn()) return Index;
-  //console.log(a);
   return (
     <MainLayout>
       <Router>
         <Switch>
           <Route exact path="/">
-            <HomePage />
+            {CookieStore.isLoggedIn() ? <HomePage /> : <AboutPage />}
           </Route>
           <Route exact path="/about">
             <AboutPage />
           </Route>
           <Route path="*">
-            <ErrorPage title="Page Not Found" />
+            <ErrorPage />
           </Route>
         </Switch>
       </Router>

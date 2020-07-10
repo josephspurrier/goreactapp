@@ -4,7 +4,7 @@ import * as React from "react";
 interface Attrs {
   label: string;
   name: string;
-  type: string;
+  type?: string;
   required: boolean;
   value: string;
 }
