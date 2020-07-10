@@ -1,10 +1,22 @@
 import * as React from "react";
+import { RouteComponentProps, withRouter } from "react-router";
+import { useHistory } from "react-router-dom";
 
 // TODO: Add link in for a.
 
-function Page(): JSX.Element {
+function Page(props: RouteComponentProps): JSX.Element {
   const title = "Welcome";
   const subtitle = "Login was successful";
+
+  console.log(props.location.pathname);
+
+  // redirect to new target using Router's History
+  //props.history.push("/about");
+
+  function handleClick(e: { preventDefault: () => void }) {
+    e.preventDefault();
+    useHistory().push("/notepad");
+  }
 
   return (
     <div>
@@ -18,7 +30,7 @@ function Page(): JSX.Element {
       </section>
       <br />
       <div className="container">
-        <a href="/notepad" data-cy="notepad-link">
+        <a href="#" onClick={handleClick} data-cy="notepad-link">
           Click here to access your Notepad.
         </a>
       </div>
@@ -26,4 +38,4 @@ function Page(): JSX.Element {
   );
 }
 
-export default Page;
+export default withRouter(Page);
