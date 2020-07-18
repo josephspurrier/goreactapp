@@ -60,7 +60,7 @@ npm:
 
 .PHONY: api-dep
 api-dep:
-	# Restore the dependencies. Get gvt if it's not found in $PATH.
+	# Restore the dependencies. Get gvt if it's not found in PATH.
 	which gvt || go get github.com/FiloSottile/gvt
 	cd ${GOPATH}/src/app/api && gvt restore
 

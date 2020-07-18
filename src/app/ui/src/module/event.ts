@@ -11,6 +11,10 @@ const EventEmitter = {
     if (!this.events[event]) this.events[event] = [];
     this.events[event].push(callback);
   },
+  unsubscribe: function (event: string): void {
+    if (!this.events[event]) return;
+    this.events[event].splice(event);
+  },
 };
 
 //module.exports = { EventEmitter };

@@ -1,4 +1,4 @@
-import * as React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { uid } from "react-uid";
 import EventEmitter from "@/module/event";
 
@@ -16,200 +16,136 @@ export enum MessageType {
 }
 
 export enum FlashEvent {
-  timeout = "timeout",
-  success = "success",
+  showMessage = "showMessage",
 }
 
 interface FlashMessage {
   message: string;
-  style: string;
-}
-
-interface State {
-  list: Array<FlashMessage>;
-  messageType: MessageType;
-  timeout: number;
-  prepend: boolean;
-  message: string;
-  id: number;
+  style: MessageType;
 }
 
 interface Props {
-  message: string;
   timeout?: number;
   prepend?: boolean;
 }
 
-//let counter: number;
+const Manager = function (props: Props): JSX.Element {
+  //const [firstLaunch, setFirstLaunch] = useState<boolean>(false);
+  //const [showtime, setShowtime] = useState<number>(props.timeout || 4000);
+  //const [prepend, setPrepend] = useState<boolean>(props.prepend || false);
+  const [list, setList] = useState<FlashMessage[]>([]);
 
-const Flash = {
-  //state: []FlashMessage,
-  state: Array <FlashMessage>: [],
-  Manager(): JSX.Element {
-    return (
-      <div
-        style={
-          {
-            marginTop: "1em",
-            position: "fixed",
-            bottom: "1.5rem",
-            right: "1.5rem",
-            zIndex: 100,
-            margin: 0,
-          } as React.CSSProperties
-        }
-      >
-        {this.state.list.map((i: FlashMessage) => (
-          <div key={uid(i)} className={`notification ${i.style}`}>
-            {i.message}
-            <button
-              className="delete"
-              onClick={() => {
-                this.removeFlash(i);
-              }}
-            ></button>
-          </div>
-        ))}
-      </div>
+  const showtime = props.timeout || 4000;
+  const prepend = props.prepend || false;
+
+  // Use a ref to access the current count value in
+  // an async callback.
+  const listRef = useRef(list);
+  listRef.current = list;
+
+  // const showMessage = function (message: string, style: MessageType): void {
+  //   addFlash(message, MessageType.success);
+  // };
+
+  // const failed = function (message: string): void {
+  //   this.addFlash(message, "is-danger");
+  // };
+
+  // const warning = function (message: string): void {
+  //   this.addFlash(message, "is-warning");
+  // };
+
+  // const primary = function (message: string): void {
+  //   this.addFlash(message, "is-primary");
+  // };
+
+  // const link = function (message: string): void {
+  //   this.addFlash(message, "is-link");
+  // };
+
+  // const info = function (message: string): void {
+  //   this.addFlash(message, "is-info");
+  // };
+
+  // const dark = function (message: string): void {
+  //   this.addFlash(message, "is-dark");
+  // };
+
+  const showMessage = (msg: FlashMessage): void => {
+    // Don't show a message if zero.
+    if (showtime === 0) {
+      return;
+    }
+
+    // Check if the messages should stack in reverse order.
+    const newList = [...list];
+    if (prepend === true) {
+      newList.unshift(msg);
+    } else {
+      newList.push(msg);
+    }
+    setList(newList);
+
+    // Show forever if -1.
+    if (showtime > 0) {
+      setTimeout(function () {
+        removeFlash(listRef.current, msg);
+      }, showtime);
+    }
+  };
+
+  const removeFlash = (arr: FlashMessage[], i: FlashMessage): void => {
+    // Prevent stale closure: must use ref of list instead of list.
+    // https://github.com/facebook/react/issues/14010
+    setList(
+      arr.filter((v: FlashMessage) => {
+        return v !== i;
+      })
     );
-  },
-  //   constructor(props: Props) {
-  //     super(props);
-  //     if (!counter) {
-  //       counter = 0;
-  //     }
-  //     this.state = {
-  //       list: [],
-  //       timeout: props.timeout || 4000,
-  //       prepend: props.prepend || false,
-  //       messageType: MessageType.success,
-  //       message: props.message,
-  //       id: counter++,
-  //     };
+  };
 
-  //     EventEmitter.subscribe(FlashEvent.timeout, (event: number) =>
-  //       this.updateTimeout(event)
-  //     );
-  //     EventEmitter.subscribe(FlashEvent.success, (event: string) =>
-  //       this.success(event)
-  //     );
-  //   }
+  useEffect(() => {
+    let mounted = true;
+    EventEmitter.subscribe(FlashEvent.showMessage, (msg: FlashMessage) => {
+      if (!mounted) {
+        console.log("CAUGHT!");
+        return false;
+      }
+      showMessage(msg);
+    });
 
-  //   updateTimeout(timeout: number): void {
-  //     this.setState({ timeout: timeout });
-  //   }
+    return () => {
+      mounted = false;
+      EventEmitter.unsubscribe(FlashEvent.showMessage);
+    };
+  });
 
-  //   success(message: string): void {
-  //     this.addFlash(message, "is-success");
-  //   }
-
-  //   //let list:Array<FlashMessage> = [];
-
-  //   //let timeout= 4000; // milliseconds
-
-  //   //let prepend = false;
-
-  //   // success(message: string): void {
-  //   //   this.addFlash(message, "is-success");
-  //   // }
-
-  //   // failed(message: string): void {
-  //   //   this.addFlash(message, "is-danger");
-  //   // }
-
-  //   // warning(message: string): void {
-  //   //   this.addFlash(message, "is-warning");
-  //   // }
-
-  //   // primary(message: string): void {
-  //   //   this.addFlash(message, "is-primary");
-  //   // }
-
-  //   // link(message: string): void {
-  //   //   this.addFlash(message, "is-link");
-  //   // }
-
-  //   // info(message: string): void {
-  //   //   this.addFlash(message, "is-info");
-  //   // }
-
-  //   // dark(message: string): void {
-  //   //   this.addFlash(message, "is-dark");
-  //   // }
-
-  //   addFlash(message: string, style: string): void {
-  //     // Don't show a message if zero.
-  //     if (this.state.timeout === 0) {
-  //       return;
-  //     }
-
-  //     const msg = {
-  //       message: message,
-  //       style: style,
-  //     };
-
-  //     // Check if the messages should stack in reverse order.
-  //     const newList = [...this.state.list];
-  //     if (this.state.prepend === true) {
-  //       newList.unshift(msg);
-  //     } else {
-  //       newList.push(msg);
-  //     }
-  //     this.setState({ list: newList });
-
-  //     // Show forever if -1.
-  //     if (this.state.timeout > 0) {
-  //       setTimeout(() => {
-  //         this.removeFlash(msg);
-  //       }, this.state.timeout);
-  //     }
-  //   }
-
-  //   removeFlash(i: FlashMessage): void {
-  //     this.setState({
-  //       list: this.state.list.filter((v: FlashMessage) => {
-  //         return v !== i;
-  //       }),
-  //     });
-  //   }
-
-  //   // clear(): void {
-  //   //   this.list = [];
-  //   // }
-
-  //   componentWillUnmount(): void {
-  //     console.log("removed");
-  //     this.setState({ list: [] });
-  //   }
-
-  //   render(): JSX.Element {
-  //     return (
-  //       <div
-  //         style={
-  //           {
-  //             marginTop: "1em",
-  //             position: "fixed",
-  //             bottom: "1.5rem",
-  //             right: "1.5rem",
-  //             zIndex: 100,
-  //             margin: 0,
-  //           } as React.CSSProperties
-  //         }
-  //       >
-  //         {this.state.list.map((i: FlashMessage) => (
-  //           <div key={uid(i)} className={`notification ${i.style}`}>
-  //             {i.message}
-  //             <button
-  //               className="delete"
-  //               onClick={() => {
-  //                 this.removeFlash(i);
-  //               }}
-  //             ></button>
-  //           </div>
-  //         ))}
-  //       </div>
-  //     );
-  //   }
+  return (
+    <div
+      style={
+        {
+          marginTop: "1em",
+          position: "fixed",
+          bottom: "1.5rem",
+          right: "1.5rem",
+          zIndex: 100,
+          margin: 0,
+        } as React.CSSProperties
+      }
+    >
+      {list.map((i: FlashMessage) => (
+        <div key={uid(i)} className={`notification ${i.style}`}>
+          {i.message}
+          <button
+            className="delete"
+            onClick={() => {
+              removeFlash(list, i);
+            }}
+          ></button>
+        </div>
+      ))}
+    </div>
+  );
 };
 
-export default Flash;
+export default { Manager };
