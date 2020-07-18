@@ -9,36 +9,69 @@ import {
   boolean,
 } from "@storybook/addon-knobs";
 import { withA11y } from "@storybook/addon-a11y";
-import Flash, { FlashEvent } from "@/component/flash";
+import Flash, { FlashEvent } from "@/component/flash2";
 import EventEmitter from "@/module/event";
 import "~/style/main.scss";
 
-storiesOf("Component/Flash", module)
-  .addDecorator(withKnobs)
-  .addDecorator(withA11y)
-  .add("Success", function () {
-    //Flash.timeout = -1;
-    //Flash.success(text("Text", "This is a success message."));
-    //Flash.clear();
+export default {
+  title: "Component/Flash",
+  component: Flash,
+  decorators: [withKnobs, withA11y],
+};
 
-    setTimeout(function () {
-      EventEmitter.dispatch(
-        FlashEvent.timeout,
-        number("Timeout (milliseconds)", 4000)
-      );
-      EventEmitter.dispatch(
-        FlashEvent.success,
-        text("Text", "This is a success message.")
-      );
-    }, 250);
+export const Success = function (): JSX.Element {
+  //Flash.Manager();
+  return (
+    <Flash timeout={-1} message={text("Text", "This is a success message.")} />
+  );
+};
 
-    return (
-      <Flash
-        timeout={-1}
-        message={text("Text", "This is a success message.")}
-      />
-    );
-  });
+// export const SuccessDispatch = function (): JSX.Element {
+//   setTimeout(function () {
+//     EventEmitter.dispatch(
+//       FlashEvent.timeout,
+//       number("Timeout (milliseconds)", 4000)
+//     );
+//     EventEmitter.dispatch(
+//       FlashEvent.success,
+//       text("Text", "This is a success message.")
+//     );
+//   }, 250);
+
+//   return (
+//     <Flash.Manager
+//       timeout={-1}
+//       message={text("Text", "This is a success message.")}
+//     />
+//   );
+// };
+
+// storiesOf("Component/Flash", module)
+//   .addDecorator(withKnobs)
+//   .addDecorator(withA11y)
+//   .add("Success", function () {
+//     //Flash.timeout = -1;
+//     //Flash.success(text("Text", "This is a success message."));
+//     //Flash.clear();
+
+//     setTimeout(function () {
+//       EventEmitter.dispatch(
+//         FlashEvent.timeout,
+//         number("Timeout (milliseconds)", 4000)
+//       );
+//       EventEmitter.dispatch(
+//         FlashEvent.success,
+//         text("Text", "This is a success message.")
+//       );
+//     }, 250);
+
+//     return (
+//       <Flash
+//         timeout={-1}
+//         message={text("Text", "This is a success message.")}
+//       />
+//     );
+//   });
 // .add("Failed", function () {
 //   Flash.timeout = -1;
 //   Flash.failed(text("Text", "This is a failed message."));
