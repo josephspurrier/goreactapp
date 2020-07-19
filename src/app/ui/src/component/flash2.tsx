@@ -30,10 +30,8 @@ interface Props {
 }
 
 const Manager = function (props: Props): JSX.Element {
-  //const [firstLaunch, setFirstLaunch] = useState<boolean>(false);
-  //const [showtime, setShowtime] = useState<number>(props.timeout || 4000);
-  //const [prepend, setPrepend] = useState<boolean>(props.prepend || false);
   const [list, setList] = useState<FlashMessage[]>([]);
+  const [timers, setTimers] = useState([]);
 
   const showtime = props.timeout || 4000;
   const prepend = props.prepend || false;
@@ -42,34 +40,6 @@ const Manager = function (props: Props): JSX.Element {
   // an async callback.
   const listRef = useRef(list);
   listRef.current = list;
-
-  // const showMessage = function (message: string, style: MessageType): void {
-  //   addFlash(message, MessageType.success);
-  // };
-
-  // const failed = function (message: string): void {
-  //   this.addFlash(message, "is-danger");
-  // };
-
-  // const warning = function (message: string): void {
-  //   this.addFlash(message, "is-warning");
-  // };
-
-  // const primary = function (message: string): void {
-  //   this.addFlash(message, "is-primary");
-  // };
-
-  // const link = function (message: string): void {
-  //   this.addFlash(message, "is-link");
-  // };
-
-  // const info = function (message: string): void {
-  //   this.addFlash(message, "is-info");
-  // };
-
-  // const dark = function (message: string): void {
-  //   this.addFlash(message, "is-dark");
-  // };
 
   const showMessage = (msg: FlashMessage): void => {
     // Don't show a message if zero.
@@ -88,9 +58,13 @@ const Manager = function (props: Props): JSX.Element {
 
     // Show forever if -1.
     if (showtime > 0) {
-      setTimeout(function () {
-        removeFlash(listRef.current, msg);
-      }, showtime);
+      const arr = [...timers];
+      arr.push(
+        setTimeout(function () {
+          removeFlash(listRef.current, msg);
+        }, showtime)
+      );
+      setTimers(arr);
     }
   };
 
@@ -107,16 +81,19 @@ const Manager = function (props: Props): JSX.Element {
   useEffect(() => {
     let mounted = true;
     EventEmitter.subscribe(FlashEvent.showMessage, (msg: FlashMessage) => {
-      if (!mounted) {
-        console.log("CAUGHT!");
-        return false;
-      }
+      if (!mounted) return false;
+
       showMessage(msg);
     });
 
     return () => {
       mounted = false;
+
       EventEmitter.unsubscribe(FlashEvent.showMessage);
+
+      for (let i = 0; i < timers.length; i++) {
+        clearTimeout(timers[i]);
+      }
     };
   });
 
