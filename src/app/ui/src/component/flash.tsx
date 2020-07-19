@@ -1,10 +1,22 @@
-import * as React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { uid } from "react-uid";
 import EventEmitter from "@/module/event";
 
-// Create a flash message class with Bulma.
-// http://bulma.io/documentation/components/message/
+// Components allows you to display flash messages on the screen that are styled
+// with Bulma: http://bulma.io/documentation/components/message/.
+// To use this component, you should use add it to your page:
+/*
+<Flash timeout={number} prepend={boolean} />
+*/
+// And then dispatch events to the component:
+/*
+EventEmitter.dispatch(FlashEvent.showMessage, {
+  message: "This is the message.",
+  style: MessageType.success,
+});
+*/
 
+// Types of styles available for the flash messages.
 export enum MessageType {
   success = "is-success",
   failed = "is-danger",
@@ -15,171 +27,137 @@ export enum MessageType {
   dark = "is-dark",
 }
 
+// Types of events this component supports.
 export enum FlashEvent {
-  timeout = "timeout",
-  success = "success",
+  showMessage = "Flash.showMessage",
 }
 
+// FlashMessage is used by the component and by others calling the component.
 interface FlashMessage {
   message: string;
-  style: string;
+  style: MessageType;
 }
 
-interface State {
-  list: Array<FlashMessage>;
-  messageType: MessageType;
-  timeout: number;
-  prepend: boolean;
-  message: string;
-  id: number;
-}
-
+// Props is the optional values that can be passed to the component.
 interface Props {
-  message: string;
   timeout?: number;
   prepend?: boolean;
 }
 
-let counter: number;
+const Flash = function (props: Props): JSX.Element {
+  // Use useState from React 16.8 so we can leverage functional components
+  // with state instead of using a class. We want to keep track of messages
+  // and timers when this component is used across pages.
+  const [list, setList] = useState<FlashMessage[]>([]);
+  // Keep track of timers to ensure we can clear them and prevent error below.
+  // "Warning: Can't perform a React state update on an unmounted component.
+  // This is a no-op, but it indicates a memory leak in your application.
+  // To fix, cancel all subscriptions and asynchronous tasks in a useEffect
+  // cleanup function."
+  // https://stackoverflow.com/a/8860210/13953226
+  const [timers, setTimers] = useState([]);
 
-class Flash extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-    if (!counter) {
-      counter = 0;
-    }
-    this.state = {
-      list: [],
-      timeout: props.timeout || 4000,
-      prepend: props.prepend || false,
-      messageType: MessageType.success,
-      message: props.message,
-      id: counter++,
-    };
+  // Handle optional props and provide defaults.
+  const showtime = props.timeout || 4000;
+  const prepend = props.prepend || false;
 
-    EventEmitter.subscribe(FlashEvent.timeout, (event: number) =>
-      this.updateTimeout(event)
-    );
-    EventEmitter.subscribe(FlashEvent.success, (event: string) =>
-      this.success(event)
-    );
-  }
+  // Use a reference to access the current value in an async callback. This
+  // prevents stale closures which are callbacks that only update a point in
+  // variable instead of the current variable.
+  // https://github.com/facebook/react/issues/14010
+  const listRef = useRef(list);
+  listRef.current = list;
 
-  updateTimeout(timeout: number): void {
-    this.setState({ timeout: timeout });
-  }
-
-  success(message: string): void {
-    this.addFlash(message, "is-success");
-  }
-
-  //let list:Array<FlashMessage> = [];
-
-  //let timeout= 4000; // milliseconds
-
-  //let prepend = false;
-
-  // success(message: string): void {
-  //   this.addFlash(message, "is-success");
-  // }
-
-  // failed(message: string): void {
-  //   this.addFlash(message, "is-danger");
-  // }
-
-  // warning(message: string): void {
-  //   this.addFlash(message, "is-warning");
-  // }
-
-  // primary(message: string): void {
-  //   this.addFlash(message, "is-primary");
-  // }
-
-  // link(message: string): void {
-  //   this.addFlash(message, "is-link");
-  // }
-
-  // info(message: string): void {
-  //   this.addFlash(message, "is-info");
-  // }
-
-  // dark(message: string): void {
-  //   this.addFlash(message, "is-dark");
-  // }
-
-  addFlash(message: string, style: string): void {
+  const showMessage = (msg: FlashMessage): void => {
     // Don't show a message if zero.
-    if (this.state.timeout === 0) {
+    if (showtime === 0) {
       return;
     }
 
-    const msg = {
-      message: message,
-      style: style,
-    };
-
     // Check if the messages should stack in reverse order.
-    const newList = [...this.state.list];
-    if (this.state.prepend === true) {
+    const newList = [...list];
+    if (prepend === true) {
       newList.unshift(msg);
     } else {
       newList.push(msg);
     }
-    this.setState({ list: newList });
+    setList(newList);
 
     // Show forever if -1.
-    if (this.state.timeout > 0) {
-      setTimeout(() => {
-        this.removeFlash(msg);
-      }, this.state.timeout);
+    if (showtime > 0) {
+      const arr = [...timers];
+      // Must pass in the listRef to prevent a stale enclosure.
+      // https://dmitripavlutin.com/react-hooks-stale-closures/
+      // https://upmostly.com/tutorials/settimeout-in-react-components-using-hooks
+      arr.push(
+        setTimeout(function () {
+          removeFlash(listRef.current, msg);
+        }, showtime)
+      );
+      setTimers(arr);
     }
-  }
+  };
 
-  removeFlash(i: FlashMessage): void {
-    this.setState({
-      list: this.state.list.filter((v: FlashMessage) => {
+  const removeFlash = (arr: FlashMessage[], i: FlashMessage): void => {
+    // Prevent stale closure: must use ref of list instead of list.
+    // https://github.com/facebook/react/issues/14010
+    setList(
+      arr.filter((v: FlashMessage) => {
         return v !== i;
-      }),
-    });
-  }
-
-  // clear(): void {
-  //   this.list = [];
-  // }
-
-  componentWillUnmount(): void {
-    console.log("removed");
-    this.setState({ list: [] });
-  }
-
-  render(): JSX.Element {
-    return (
-      <div
-        style={
-          {
-            marginTop: "1em",
-            position: "fixed",
-            bottom: "1.5rem",
-            right: "1.5rem",
-            zIndex: 100,
-            margin: 0,
-          } as React.CSSProperties
-        }
-      >
-        {this.state.list.map((i: FlashMessage) => (
-          <div key={uid(i)} className={`notification ${i.style}`}>
-            {i.message}
-            <button
-              className="delete"
-              onClick={() => {
-                this.removeFlash(i);
-              }}
-            ></button>
-          </div>
-        ))}
-      </div>
+      })
     );
-  }
-}
+  };
+
+  // The Effect Hook is available in 16.8 to allow functional components to be
+  // stateful without a class.
+  // https://reactjs.org/docs/hooks-effect.html
+  // Equivalent to: componentDidMount()
+  useEffect(() => {
+    // Subscribe so messages can be added from other components.
+    EventEmitter.subscribe(FlashEvent.showMessage, (msg: FlashMessage) => {
+      showMessage(msg);
+    });
+
+    // Perform cleanup - equivalent to: componentWillUnmount()
+    return () => {
+      // Unsubscribe on unmount so no more changes can be made to the component
+      // by outside components.
+      EventEmitter.unsubscribe(FlashEvent.showMessage);
+
+      // Clear all the timers to prevent error:
+      // "Can't perform a React state update on an unmounted component.""
+      for (let i = 0; i < timers.length; i++) {
+        clearTimeout(timers[i]);
+      }
+    };
+  });
+
+  return (
+    <div
+      style={
+        {
+          marginTop: "1em",
+          position: "fixed",
+          bottom: "1.5rem",
+          right: "1.5rem",
+          zIndex: 100,
+          margin: 0,
+        } as React.CSSProperties
+      }
+    >
+      {list.map((i: FlashMessage) => (
+        <div key={uid(i)} className={`notification ${i.style}`}>
+          {i.message}
+          <button
+            className="delete"
+            onClick={() => {
+              removeFlash(list, i);
+            }}
+          ></button>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export default Flash;
