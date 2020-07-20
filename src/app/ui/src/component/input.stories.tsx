@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import * as React from "react";
+import { useState } from "react";
 import { withKnobs, select, text } from "@storybook/addon-knobs";
 import { withA11y } from "@storybook/addon-a11y";
 import Input from "./input";

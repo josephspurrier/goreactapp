@@ -1,6 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import React from "react";
-
 interface Props {
   id: string;
   func: () => void;

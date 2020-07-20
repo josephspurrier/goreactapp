@@ -1,13 +1,14 @@
-import Cookie from "js-cookie";
+import * as Cookie from "js-cookie";
 
-interface SaveAttrs {
-  auth: string;
+interface Auth {
+  accessToken: string;
+  loggedIn: boolean;
 }
 
 const CookieStore = {
   cookieName: "auth",
-  save: function (props: SaveAttrs): void {
-    Cookie.set(CookieStore.cookieName, props.auth);
+  save: function (props: Auth): void {
+    Cookie.set(CookieStore.cookieName, props);
   },
   clear: function (): void {
     Cookie.remove(CookieStore.cookieName);
