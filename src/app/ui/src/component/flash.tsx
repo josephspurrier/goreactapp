@@ -44,7 +44,7 @@ interface Props {
   prepend?: boolean;
 }
 
-// Determine if component is mounted or not.
+// Track if component is mounted or not.
 // https://www.debuggr.io/react-update-unmounted-component/
 function useIsMountedRef() {
   const isMountedRef = useRef(null);
@@ -56,24 +56,14 @@ function useIsMountedRef() {
 }
 
 const Flash = function (props: Props): JSX.Element {
-  // Use a reference to whether component is mounted or not.
-  const isMountedRef = useIsMountedRef();
+  // Handle optional props and provide defaults.
+  const showtime = props.timeout || 4000;
+  const prepend = props.prepend || false;
 
   // Use useState from React 16.8 so we can leverage functional components
   // with state instead of using a class. We want to keep track of messages
   // and timers when this component is used across pages.
   const [list, setList] = useState<FlashMessage[]>([]);
-  // Keep track of timers to ensure we can clear them and prevent error below.
-  // "Warning: Can't perform a React state update on an unmounted component.
-  // This is a no-op, but it indicates a memory leak in your application.
-  // To fix, cancel all subscriptions and asynchronous tasks in a useEffect
-  // cleanup function."
-  // https://stackoverflow.com/a/8860210/13953226
-  const [timers, setTimers] = useState([]);
-
-  // Handle optional props and provide defaults.
-  const showtime = props.timeout || 4000;
-  const prepend = props.prepend || false;
 
   // Use a reference to access the current value in an async callback. This
   // prevents stale closures which are callbacks that only update a point in
@@ -81,6 +71,9 @@ const Flash = function (props: Props): JSX.Element {
   // https://github.com/facebook/react/issues/14010
   const listRef = useRef(list);
   listRef.current = list;
+
+  // Use a reference to whether component is mounted or not.
+  const isMountedRef = useIsMountedRef();
 
   const showMessage = (msg: FlashMessage): void => {
     // Don't show a message if zero.
@@ -99,31 +92,29 @@ const Flash = function (props: Props): JSX.Element {
 
     // Show forever if -1.
     if (showtime > 0) {
-      const arr = [...timers];
-      // Must pass in the listRef to prevent a stale enclosure.
-      // https://dmitripavlutin.com/react-hooks-stale-closures/
-      // https://upmostly.com/tutorials/settimeout-in-react-components-using-hooks
-      arr.push(
-        setTimeout(function () {
-          removeFlash(listRef.current, msg);
-        }, showtime)
-      );
-      setTimers(arr);
+      setTimeout(function () {
+        removeFlash(msg);
+      }, showtime);
     }
   };
 
-  const removeFlash = (arr: FlashMessage[], i: FlashMessage): void => {
-    // Prevent stale closure: must use ref of list instead of list.
-    // https://github.com/facebook/react/issues/14010
-
-    // If the component is not mounted, then don't remove the message.
+  const removeFlash = (i: FlashMessage): void => {
+    // If the component is not mounted, then don't change state to prevent
+    // the error below.
+    // "Warning: Can't perform a React state update on an unmounted component.
+    // This is a no-op, but it indicates a memory leak in your application.
+    // To fix, cancel all subscriptions and asynchronous tasks in a useEffect
+    // cleanup function."
+    // https://stackoverflow.com/a/8860210/13953226
     // https://www.debuggr.io/react-update-unmounted-component/
     if (!isMountedRef.current) {
       return;
     }
 
+    // Prevent stale closure: must use ref of list instead of list.
+    // https://github.com/facebook/react/issues/14010
     setList(
-      arr.filter((v: FlashMessage) => {
+      listRef.current.filter((v: FlashMessage) => {
         return v !== i;
       })
     );
@@ -164,7 +155,7 @@ const Flash = function (props: Props): JSX.Element {
           <button
             className="delete"
             onClick={() => {
-              removeFlash(list, i);
+              removeFlash(i);
             }}
           ></button>
         </div>
