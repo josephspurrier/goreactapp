@@ -1,13 +1,12 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 const EventEmitter = {
   events: {},
-  dispatch: function (event: string, data: any): void {
+  dispatch: function (event: string, data: unknown): void {
     if (!this.events[event]) return;
-    this.events[event].forEach((callback: (arg0: any) => any) =>
+    this.events[event].forEach((callback: (arg0: unknown) => unknown) =>
       callback(data)
     );
   },
-  subscribe: function (event: string, callback: any): void {
+  subscribe: function (event: string, callback: unknown): void {
     if (!this.events[event]) this.events[event] = [];
     this.events[event].push(callback);
   },
@@ -17,5 +16,4 @@ const EventEmitter = {
   },
 };
 
-//module.exports = { EventEmitter };
 export default EventEmitter;
