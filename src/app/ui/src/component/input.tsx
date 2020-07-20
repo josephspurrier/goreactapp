@@ -1,18 +1,15 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import * as React from "react";
+import React from "react";
 
-interface Attrs {
-  label: string;
+interface Props {
+  label?: string;
   name: string;
   type?: string;
-  required: boolean;
+  required?: boolean;
   value: string;
+  onChange: (e: string) => void;
 }
 
-// FIXME: Need to add input.
-//         onInput={props.oninput}
-
-function View(props: Attrs): JSX.Element {
+function View(props: Props): JSX.Element {
   return (
     <div className="field">
       <label className="label">{props.label}</label>
@@ -24,6 +21,9 @@ function View(props: Attrs): JSX.Element {
           data-cy={props.name}
           required={props.required}
           value={props.value}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            props.onChange(e.currentTarget.value);
+          }}
         ></input>
       </div>
     </div>
