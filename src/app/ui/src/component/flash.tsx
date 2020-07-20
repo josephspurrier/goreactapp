@@ -44,7 +44,21 @@ interface Props {
   prepend?: boolean;
 }
 
+// Determine if component is mounted or not.
+// https://www.debuggr.io/react-update-unmounted-component/
+function useIsMountedRef() {
+  const isMountedRef = useRef(null);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => (isMountedRef.current = false);
+  });
+  return isMountedRef;
+}
+
 const Flash = function (props: Props): JSX.Element {
+  // Use a reference to whether component is mounted or not.
+  const isMountedRef = useIsMountedRef();
+
   // Use useState from React 16.8 so we can leverage functional components
   // with state instead of using a class. We want to keep track of messages
   // and timers when this component is used across pages.
@@ -101,6 +115,13 @@ const Flash = function (props: Props): JSX.Element {
   const removeFlash = (arr: FlashMessage[], i: FlashMessage): void => {
     // Prevent stale closure: must use ref of list instead of list.
     // https://github.com/facebook/react/issues/14010
+
+    // If the component is not mounted, then don't remove the message.
+    // https://www.debuggr.io/react-update-unmounted-component/
+    if (!isMountedRef.current) {
+      return;
+    }
+
     setList(
       arr.filter((v: FlashMessage) => {
         return v !== i;
@@ -120,15 +141,7 @@ const Flash = function (props: Props): JSX.Element {
 
     // Perform cleanup - equivalent to: componentWillUnmount()
     return () => {
-      // Unsubscribe on unmount so no more changes can be made to the component
-      // by outside components.
       EventEmitter.unsubscribe(FlashEvent.showMessage);
-
-      // Clear all the timers to prevent error:
-      // "Can't perform a React state update on an unmounted component.""
-      for (let i = 0; i < timers.length; i++) {
-        clearTimeout(timers[i]);
-      }
     };
   });
 
