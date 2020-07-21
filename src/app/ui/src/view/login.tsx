@@ -1,35 +1,44 @@
 import * as React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
+import { useState } from "react";
+import { RouteComponentProps, withRouter, Redirect } from "react-router";
 //import PropTypes from "prop-types";
 import UserLogin from "@/store/userlogin";
 import Input from "@/component/input";
 
 interface PageProps extends RouteComponentProps {
+  email?: string;
+  password?: string;
+}
+
+interface User {
   email: string;
   password: string;
 }
 
-function Page(props: PageProps) {
-  let user = {
-    email: "",
-    password: "",
-  };
-
+function Page(props: PageProps): JSX.Element {
   const data = {
     title: "Login",
     subtitle: "Enter your login information below.",
   };
 
   const clear = () => {
-    user = {
-      email: "",
-      password: "",
-    };
+    setUser({ email: "", password: "" });
   };
+
+  const [user, setUser] = useState<User>({ email: "", password: "" });
+  const [loggedIn, setLoggedIn] = useState<boolean>(false);
 
   function toRegister(e: { preventDefault: () => void }) {
     e.preventDefault();
-    props.history.push("/register");
+    //props.history.push("/register");
+  }
+
+  console.log("Redrawn");
+
+  if (loggedIn) {
+    console.log("Logged in!");
+    //props.history.push("/about");
+    //return <Redirect to="/about" />;
   }
 
   // // Prefill the fields.
@@ -51,22 +60,28 @@ function Page(props: PageProps) {
 
           <div
             className="container"
-            style={{ "margin-top": "1em" } as React.CSSProperties}
+            style={{ marginTop: "1em" } as React.CSSProperties}
           >
             <form
               name="login"
               onSubmit={(e) => {
                 UserLogin(e, user).then(() => {
-                  clear();
+                  console.log("go!");
+                  //clear();
+                  //setLoggedIn(true);
+                  props.history.push("/");
                 });
               }}
             >
               <Input
                 label="Email"
                 name="email"
+                type="email"
                 required={true}
-                oninput={(e: { target: { value: string } }) => {
-                  user.email = e.target.value;
+                onChange={(e: string) => {
+                  const newUser = { ...user };
+                  newUser.email = e;
+                  setUser(newUser);
                 }}
                 value={user.email}
               />
@@ -75,8 +90,10 @@ function Page(props: PageProps) {
                 label="Password"
                 name="password"
                 required={true}
-                oninput={(e: { target: { value: string } }) => {
-                  user.password = e.target.value;
+                onChange={(e: string) => {
+                  const newUser = { ...user };
+                  newUser.password = e;
+                  setUser(newUser);
                 }}
                 value={user.password}
                 type="password"

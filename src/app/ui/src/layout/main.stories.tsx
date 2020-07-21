@@ -1,8 +1,8 @@
-import React from "react";
+import * as React from "react";
 import { storiesOf } from "@storybook/react";
 import { withKnobs, text } from "@storybook/addon-knobs";
 import { withA11y } from "@storybook/addon-a11y";
-import LayoutMain from "./main";
+import LayoutMain from "@/layout/main";
 import SimplePage from "@/component/simple-page";
 import "~/style/main.scss";
 

@@ -1,12 +1,14 @@
 import * as React from "react";
+import { RouteComponentProps, withRouter, Redirect } from "react-router";
 import CookieStore from "@/module/cookiestore";
 
 // FIXME: Need to fix the LINKs below and the page redirect.
 
-function View(): JSX.Element {
+function View(props: RouteComponentProps): JSX.Element {
   const logout = () => {
     CookieStore.clear();
-    //m.route.set("/");
+    props.history.push("/login");
+    //return <Redirect to="/login" />;
   };
 
   return (
@@ -18,7 +20,7 @@ function View(): JSX.Element {
       >
         <div className="navbar-brand">
           <a className="navbar-item" href="/" data-cy="home-link">
-            <strong>gomithrilapp</strong>
+            <strong>goreactapp</strong>
           </a>
 
           <a
@@ -82,4 +84,4 @@ function View(): JSX.Element {
   );
 }
 
-export default View;
+export default withRouter(View);

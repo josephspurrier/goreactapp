@@ -5,7 +5,10 @@ import { FlashEvent, MessageType } from "@/component/flash";
 import EventEmitter from "@/module/event";
 import CookieStore from "@/module/cookiestore";
 
-const UserLogin = (e, user) => {
+const UserLogin = (
+  e: React.FormEvent<HTMLFormElement>,
+  user: { email: string; password: string }
+): Promise<void> => {
   Submit.start(e);
 
   return fetch("/api/v1/login", {
@@ -13,34 +16,38 @@ const UserLogin = (e, user) => {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(user),
   })
-    .then((response) => response.json())
-    .then((data) => {
-      //setState({ postId: data.id });
+    .then((response) => {
+      if (response.status === 200) {
+        response.json().then(function (data) {
+          //setState({ postId: data.id });
 
-      Submit.finish();
+          Submit.finish();
 
-      const auth = {
-        accessToken: data.token,
-        loggedIn: true,
-      };
+          const auth = {
+            accessToken: data.token,
+            loggedIn: true,
+          };
 
-      CookieStore.save(auth);
+          CookieStore.save(auth);
 
-      //Flash.success("Login successful.");
-      EventEmitter.dispatch(FlashEvent.showMessage, {
-        message: "Login successful.",
-        style: MessageType.success,
-      });
-      //m.route.set("/");
+          EventEmitter.dispatch(FlashEvent.showMessage, {
+            message: "Login successful.",
+            style: MessageType.success,
+          });
+          //m.route.set("/");
+        });
+      } else {
+        response.json().then(function (data) {
+          Submit.finish();
+          EventEmitter.dispatch(FlashEvent.showMessage, {
+            message: data.message,
+            style: MessageType.warning,
+          });
+        });
+      }
     })
     .catch((err) => {
-      Submit.finish();
-      //Flash.warning(err.response.message);
-      EventEmitter.dispatch(FlashEvent.showMessage, {
-        message: err.response.message,
-        style: MessageType.warning,
-      });
-      throw err;
+      console.log("Error needs to be handled!", err);
     });
 };
 
