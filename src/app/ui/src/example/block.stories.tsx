@@ -1,19 +1,28 @@
 import * as React from "react";
-import { storiesOf } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
 import { withKnobs, text, boolean, number } from "@storybook/addon-knobs";
 import { withA11y } from "@storybook/addon-a11y";
 import Block from "@/example/block";
 
-storiesOf("Example/Block", module)
-  .addDecorator(withKnobs)
-  .addDecorator(withA11y)
-  .add("Block", () => (
+export default {
+  title: "Example/Block",
+  component: Block,
+  decorators: [withKnobs, withA11y],
+};
+
+export const View = function (): JSX.Element {
+  return (
     <Block>
       <span>Hello</span>
     </Block>
-  ))
-  .add("Button", () => (
+  );
+};
+View.story = {
+  name: "Block",
+};
+
+export const Button = function (): JSX.Element {
+  return (
     <button
       disabled={boolean("Disabled", false)}
       onClick={() => {
@@ -23,22 +32,29 @@ storiesOf("Example/Block", module)
     >
       {text("Label", "Hello Storybook")}
     </button>
-  ))
-  .add("DynamicText", () => {
-    const name = text("Name", "Joe");
-    const age = number("Age", 32);
-    return (
-      <div>
-        I am {name} and I am {age} years old.
-      </div>
-    );
-  })
-  .add("Text", () => (
+  );
+};
+
+export const DynamicText = function (): JSX.Element {
+  const name = text("Name", "Joe");
+  const age = number("Age", 32);
+  return (
+    <div>
+      I am {name} and I am {age} years old.
+    </div>
+  );
+};
+
+export const Text = function (): JSX.Element {
+  return (
     <Block>
       <div>{text("Text", "Text")}</div>
     </Block>
-  ))
-  .add("Emoji", () => (
+  );
+};
+
+export const Emoji = function (): JSX.Element {
+  return (
     <Block>
       <div>
         <form>
@@ -48,4 +64,5 @@ storiesOf("Example/Block", module)
         </form>
       </div>
     </Block>
-  ));
+  );
+};

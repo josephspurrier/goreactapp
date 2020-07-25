@@ -1,11 +1,19 @@
 import * as React from "react";
-import { storiesOf } from "@storybook/react";
 import { withKnobs } from "@storybook/addon-knobs";
 import { withA11y } from "@storybook/addon-a11y";
 import ErrorPage from "@/view/error";
 import "~/style/main.scss";
 
-storiesOf("View/Error", module)
-  .addDecorator(withKnobs)
-  .addDecorator(withA11y)
-  .add("Error", () => <ErrorPage title="Page Not Found" />);
+export default {
+  title: "View/Error",
+  component: ErrorPage,
+  decorators: [withKnobs, withA11y],
+};
+
+export const View = function (): JSX.Element {
+  return <ErrorPage title="Page Not Found" />;
+};
+
+View.story = {
+  name: "Error",
+};
