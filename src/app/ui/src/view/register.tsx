@@ -17,30 +17,23 @@ interface User {
   password: string;
 }
 
-function Page(): JSX.Element {
-  // // Prefill the fields.
-  // if (vnodeInitial.attrs.firstName) {
-  //   UserRegister.user.first_name = vnodeInitial.attrs.firstName;
-  // }
-  // if (vnodeInitial.attrs.lastName) {
-  //   UserRegister.user.last_name = vnodeInitial.attrs.lastName;
-  // }
-  // if (vnodeInitial.attrs.email) {
-  //   UserRegister.user.email = vnodeInitial.attrs.email;
-  // }
-  // if (vnodeInitial.attrs.password) {
-  //   UserRegister.user.password = vnodeInitial.attrs.password;
-  // }
+interface defaultProps {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  password?: string;
+}
 
+function Page(props: defaultProps): JSX.Element {
   const clear = () => {
     setUser({ first_name: "", last_name: "", email: "", password: "" });
   };
 
   const [user, setUser] = useState<User>({
-    first_name: "",
-    last_name: "",
-    email: "",
-    password: "",
+    first_name: props.firstName || "",
+    last_name: props.lastName || "",
+    email: props.email || "",
+    password: props.password || "",
   });
 
   return (
