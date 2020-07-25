@@ -1,13 +1,13 @@
 import * as React from "react";
-import { RouteComponentProps, withRouter } from "react-router";
+import { navigate } from "hookrouter";
 
-function Page(props: RouteComponentProps): JSX.Element {
+function Page(): JSX.Element {
   const title = "Welcome";
   const subtitle = "Login was successful";
 
   function onclick(e: { preventDefault: () => void }) {
     e.preventDefault();
-    props.history.push("/notepad");
+    navigate("/notepad");
   }
 
   return (
@@ -30,4 +30,4 @@ function Page(props: RouteComponentProps): JSX.Element {
   );
 }
 
-export default withRouter(Page);
+export default Page;

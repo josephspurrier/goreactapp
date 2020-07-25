@@ -1,14 +1,26 @@
 import * as React from "react";
-import { RouteComponentProps, withRouter, Redirect } from "react-router";
-import CookieStore from "@/module/cookiestore";
+import { navigate } from "hookrouter";
+import { useCookies } from "react-cookie";
 
-// FIXME: Need to fix the LINKs below and the page redirect.
+function View(): JSX.Element {
+  const [cookie, , removeCookie] = useCookies(["auth"]);
 
-function View(props: RouteComponentProps): JSX.Element {
-  const logout = () => {
-    CookieStore.clear();
-    props.history.push("/login");
-    //return <Redirect to="/login" />;
+  const clear = function (): void {
+    removeCookie("auth", { path: "/" });
+  };
+
+  const isLoggedIn = function (): boolean {
+    try {
+      const auth = cookie.auth;
+      if (auth === undefined) {
+        return false;
+      }
+      return true;
+    } catch (err) {
+      console.log(err);
+    }
+
+    return false;
   };
 
   return (
@@ -49,8 +61,13 @@ function View(props: RouteComponentProps): JSX.Element {
               <a className="navbar-link">Menu</a>
 
               <div className="navbar-dropdown is-right">
-                {!CookieStore.isLoggedIn() && (
-                  <a className="navbar-item" href="/login">
+                {!isLoggedIn() && (
+                  <a
+                    className="navbar-item"
+                    onClick={() => {
+                      navigate("/login");
+                    }}
+                  >
                     Login
                   </a>
                 )}
@@ -60,15 +77,22 @@ function View(props: RouteComponentProps): JSX.Element {
                 >
                   Swagger
                 </a>
-                <a className="navbar-item" href="/about">
+
+                <a
+                  className="navbar-item"
+                  onClick={() => {
+                    navigate("/about");
+                  }}
+                >
                   About
                 </a>
                 <hr className="navbar-divider" />
-                {CookieStore.isLoggedIn() && (
+                {isLoggedIn() && (
                   <a
                     className="dropdown-item"
                     onClick={() => {
-                      logout();
+                      clear();
+                      navigate("/login");
                     }}
                   >
                     Logout
@@ -84,4 +108,4 @@ function View(props: RouteComponentProps): JSX.Element {
   );
 }
 
-export default withRouter(View);
+export default View;

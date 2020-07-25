@@ -1,47 +1,47 @@
 import * as React from "react";
 import { useState } from "react";
 import { navigate } from "hookrouter";
-import Submit from "@/module/submit";
 import Input from "@/component/input";
-import { messageType, showFlash } from "@/component/flash";
-import { useCookies } from "react-cookie";
+import Submit from "@/module/submit";
+import { showFlash, messageType } from "@/component/flash";
 
-interface PageProps {
-  email?: string;
-  password?: string;
-}
+const data = {
+  title: "Register",
+  subtitle: "Enter your information below.",
+};
 
 interface User {
+  first_name: string;
+  last_name: string;
   email: string;
   password: string;
 }
 
-function Page(/*props: PageProps*/): JSX.Element {
-  const data = {
-    title: "Login",
-    subtitle: "Enter your login information below.",
-  };
+function Page(): JSX.Element {
+  // // Prefill the fields.
+  // if (vnodeInitial.attrs.firstName) {
+  //   UserRegister.user.first_name = vnodeInitial.attrs.firstName;
+  // }
+  // if (vnodeInitial.attrs.lastName) {
+  //   UserRegister.user.last_name = vnodeInitial.attrs.lastName;
+  // }
+  // if (vnodeInitial.attrs.email) {
+  //   UserRegister.user.email = vnodeInitial.attrs.email;
+  // }
+  // if (vnodeInitial.attrs.password) {
+  //   UserRegister.user.password = vnodeInitial.attrs.password;
+  // }
 
   const clear = () => {
-    setUser({ email: "", password: "" });
+    setUser({ first_name: "", last_name: "", email: "", password: "" });
   };
 
-  const [user, setUser] = useState<User>({ email: "", password: "" });
-
-  function toRegister(e: { preventDefault: () => void }) {
-    e.preventDefault();
-    navigate("/register");
-  }
-
-  // // Prefill the fields.
-  // if (props.email) {
-  //   user.email = props.email;
-  // }
-  // if (props.password) {
-  //   user.password = props.password;
-  // }
-
-  const [, setCookie] = useCookies(["auth"]);
+  const [user, setUser] = useState<User>({
+    first_name: "",
+    last_name: "",
+    email: "",
+    password: "",
+  });
 
   return (
     <main>
@@ -60,31 +60,21 @@ function Page(/*props: PageProps*/): JSX.Element {
               name="login"
               onSubmit={(e) => {
                 e.preventDefault();
-
                 Submit.start(e);
-
-                fetch("/api/v1/login", {
+                fetch("/api/v1/register", {
                   method: "POST",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify(user),
                 })
                   .then((response) => {
-                    const auth = {
-                      accessToken: "",
-                      loggedIn: false,
-                    };
-
-                    if (response.status === 200) {
-                      response.json().then(function (data) {
+                    if (response.status === 201) {
+                      response.json().then(function () {
+                        clear();
                         Submit.finish();
 
-                        auth.loggedIn = true;
-                        auth.accessToken = data.token;
-                        setCookie("auth", auth);
+                        showFlash("User registered.", messageType.success);
 
-                        showFlash("Login successful.", messageType.success);
-
-                        navigate("/");
+                        navigate("/login");
                       });
                     } else {
                       response.json().then(function (data) {
@@ -98,6 +88,32 @@ function Page(/*props: PageProps*/): JSX.Element {
                   });
               }}
             >
+              <Input
+                label="First Name"
+                name="first_name"
+                type="text"
+                required={true}
+                onChange={(e: string) => {
+                  const newUser = { ...user };
+                  newUser.first_name = e;
+                  setUser(newUser);
+                }}
+                value={user.first_name}
+              />
+
+              <Input
+                label="Last Name"
+                name="last_name"
+                type="text"
+                required={true}
+                onChange={(e: string) => {
+                  const newUser = { ...user };
+                  newUser.last_name = e;
+                  setUser(newUser);
+                }}
+                value={user.last_name}
+              />
+
               <Input
                 label="Email"
                 name="email"
@@ -132,7 +148,7 @@ function Page(/*props: PageProps*/): JSX.Element {
                     data-cy="submit"
                     className="button is-primary"
                   >
-                    Submit
+                    Create Account
                   </button>
                 </p>
 
@@ -146,12 +162,6 @@ function Page(/*props: PageProps*/): JSX.Element {
                   >
                     Clear
                   </button>
-                </p>
-
-                <p className="control">
-                  <a href="#" className="button is-light" onClick={toRegister}>
-                    Register
-                  </a>
                 </p>
               </div>
             </form>

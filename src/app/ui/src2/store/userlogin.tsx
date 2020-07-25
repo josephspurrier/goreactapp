@@ -3,12 +3,18 @@ import * as React from "react";
 import Submit from "@/module/submit";
 import { FlashEvent, MessageType } from "@/component/flash";
 import EventEmitter from "@/module/event";
-import CookieStore from "@/module/cookiestore";
+//import CookieStore from "@/module/cookiestore";
+import { useCookies } from "react-cookie";
+
+interface Auth {
+  accessToken: string;
+  loggedIn: boolean;
+}
 
 const UserLogin = (
   e: React.FormEvent<HTMLFormElement>,
   user: { email: string; password: string }
-): Promise<void> => {
+): Promise<Auth> => {
   Submit.start(e);
 
   return fetch("/api/v1/login", {
@@ -17,37 +23,45 @@ const UserLogin = (
     body: JSON.stringify(user),
   })
     .then((response) => {
+      const auth = {
+        accessToken: "",
+        loggedIn: false,
+      };
+
       if (response.status === 200) {
         response.json().then(function (data) {
           //setState({ postId: data.id });
 
           Submit.finish();
 
-          const auth = {
-            accessToken: data.token,
-            loggedIn: true,
-          };
-
-          CookieStore.save(auth);
+          //CookieStore.save(auth);
 
           EventEmitter.dispatch(FlashEvent.showMessage, {
             message: "Login successful.",
             style: MessageType.success,
           });
           //m.route.set("/");
+
+          return auth;
         });
       } else {
-        response.json().then(function (data) {
+        return response.json().then(function (data) {
           Submit.finish();
           EventEmitter.dispatch(FlashEvent.showMessage, {
             message: data.message,
             style: MessageType.warning,
           });
+          return auth;
         });
       }
     })
     .catch((err) => {
       console.log("Error needs to be handled!", err);
+      const auth = {
+        accessToken: "",
+        loggedIn: false,
+      };
+      return auth;
     });
 };
 

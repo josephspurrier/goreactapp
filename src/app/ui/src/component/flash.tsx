@@ -11,14 +11,11 @@ import EventEmitter from "@/module/event";
 */
 // And then dispatch events to the component:
 /*
-EventEmitter.dispatch(FlashEvent.showMessage, {
-  message: "This is the message.",
-  style: MessageType.success,
-});
+showMessage("This is the message", messageType.success);
 */
 
 // Types of styles available for the flash messages.
-export enum MessageType {
+export enum messageType {
   success = "is-success",
   failed = "is-danger",
   warning = "is-warning",
@@ -29,18 +26,18 @@ export enum MessageType {
 }
 
 // Types of events this component supports.
-export enum FlashEvent {
+export enum flashEvent {
   showMessage = "Flash.showMessage",
 }
 
-// FlashMessage is used by the component and by others calling the component.
-interface FlashMessage {
+// flashMessage is used by the component and by others calling the component.
+interface flashMessage {
   message: string;
-  style: MessageType;
+  style: messageType;
 }
 
-// Props is the optional values that can be passed to the component.
-interface Props {
+// defaultProps is the optional values that can be passed to the component.
+interface defaultProps {
   timeout?: number;
   prepend?: boolean;
 }
@@ -56,7 +53,14 @@ function useIsMountedRef() {
   return isMountedRef;
 }
 
-const Flash = function (props: Props): JSX.Element {
+export const showFlash = function (message: string, style: messageType): void {
+  EventEmitter.dispatch(flashEvent.showMessage, {
+    message: message,
+    style: style,
+  });
+};
+
+const Flash = function (props: defaultProps): JSX.Element {
   // Handle optional props and provide defaults.
   const showtime = props.timeout || 4000;
   const prepend = props.prepend || false;
@@ -64,7 +68,7 @@ const Flash = function (props: Props): JSX.Element {
   // Use useState from React 16.8 so we can leverage functional components
   // with state instead of using a class. We want to keep track of messages
   // and timers when this component is used across pages.
-  const [list, setList] = useState<FlashMessage[]>([]);
+  const [list, setList] = useState<flashMessage[]>([]);
 
   // Use a reference to access the current value in an async callback. This
   // prevents stale closures which are callbacks that only update a point in
@@ -76,7 +80,7 @@ const Flash = function (props: Props): JSX.Element {
   // Use a reference to whether component is mounted or not.
   const isMountedRef = useIsMountedRef();
 
-  const showMessage = (msg: FlashMessage): void => {
+  const showMessage = (msg: flashMessage): void => {
     // Don't show a message if zero.
     if (showtime === 0) {
       return;
@@ -99,7 +103,7 @@ const Flash = function (props: Props): JSX.Element {
     }
   };
 
-  const removeFlash = (i: FlashMessage): void => {
+  const removeFlash = (i: flashMessage): void => {
     // If the component is not mounted, then don't change state to prevent
     // the error below.
     // "Warning: Can't perform a React state update on an unmounted component.
@@ -115,7 +119,7 @@ const Flash = function (props: Props): JSX.Element {
     // Prevent stale closure: must use ref of list instead of list.
     // https://github.com/facebook/react/issues/14010
     setList(
-      listRef.current.filter((v: FlashMessage) => {
+      listRef.current.filter((v: flashMessage) => {
         return v !== i;
       })
     );
@@ -127,13 +131,13 @@ const Flash = function (props: Props): JSX.Element {
   // Equivalent to: componentDidMount()
   useEffect(() => {
     // Subscribe so messages can be added from other components.
-    EventEmitter.subscribe(FlashEvent.showMessage, (msg: FlashMessage) => {
+    EventEmitter.subscribe(flashEvent.showMessage, (msg: flashMessage) => {
       showMessage(msg);
     });
 
     // Perform cleanup - equivalent to: componentWillUnmount()
     return () => {
-      EventEmitter.unsubscribe(FlashEvent.showMessage);
+      EventEmitter.unsubscribe(flashEvent.showMessage);
     };
   });
 
@@ -150,7 +154,7 @@ const Flash = function (props: Props): JSX.Element {
         } as React.CSSProperties
       }
     >
-      {list.map((i: FlashMessage) => (
+      {list.map((i: flashMessage) => (
         <div key={uid(i)} className={`notification ${i.style}`}>
           {i.message}
           <button
