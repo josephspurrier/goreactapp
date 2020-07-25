@@ -31,7 +31,13 @@ function View(): JSX.Element {
         aria-label="main navigation"
       >
         <div className="navbar-brand">
-          <a className="navbar-item" href="/" data-cy="home-link">
+          <a
+            className="navbar-item"
+            data-cy="home-link"
+            onClick={() => {
+              navigate("/");
+            }}
+          >
             <strong>goreactapp</strong>
           </a>
 

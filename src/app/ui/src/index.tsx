@@ -10,7 +10,7 @@ import MainLayout from "@/layout/main";
 import "~/node_modules/@fortawesome/fontawesome-free/js/all.js";
 import "~/style/main.scss";
 
-function Root() {
+function Root(): JSX.Element {
   const routeResult = useRoutes(Routes);
   return routeResult || <ErrorPage />;
 }
