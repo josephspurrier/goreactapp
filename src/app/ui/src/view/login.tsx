@@ -6,7 +6,7 @@ import Input from "@/component/input";
 import { messageType, showFlash } from "@/component/flash";
 import { useCookies } from "react-cookie";
 
-interface PageProps {
+interface defaultProps {
   email?: string;
   password?: string;
 }
@@ -16,7 +16,7 @@ interface User {
   password: string;
 }
 
-function Page(/*props: PageProps*/): JSX.Element {
+function Page(props: defaultProps): JSX.Element {
   const data = {
     title: "Login",
     subtitle: "Enter your login information below.",
@@ -26,20 +26,15 @@ function Page(/*props: PageProps*/): JSX.Element {
     setUser({ email: "", password: "" });
   };
 
-  const [user, setUser] = useState<User>({ email: "", password: "" });
+  const [user, setUser] = useState<User>({
+    email: props.email || "",
+    password: props.password || "",
+  });
 
   function toRegister(e: { preventDefault: () => void }) {
     e.preventDefault();
     navigate("/register");
   }
-
-  // // Prefill the fields.
-  // if (props.email) {
-  //   user.email = props.email;
-  // }
-  // if (props.password) {
-  //   user.password = props.password;
-  // }
 
   const [, setCookie] = useCookies(["auth"]);
 

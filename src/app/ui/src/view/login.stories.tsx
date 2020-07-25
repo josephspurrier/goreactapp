@@ -1,5 +1,4 @@
 import * as React from "react";
-import { BrowserRouter as Router } from "react-router-dom";
 import { withKnobs, text, boolean } from "@storybook/addon-knobs";
 import { withA11y } from "@storybook/addon-a11y";
 import LayoutMain from "@/layout/main";
@@ -42,13 +41,11 @@ export const Login = (): JSX.Element => {
 
   return (
     <LayoutMain>
-      <Router>
-        <LoginPage
-          email={text("Email", "jsmith@example.com")}
-          password={text("Password", "password")}
-        />
-        <Flash />
-      </Router>
+      <LoginPage
+        email={text("Email", "jsmith@example.com")}
+        password={text("Password", "password")}
+      />
+      <Flash />
     </LayoutMain>
   );
 };
