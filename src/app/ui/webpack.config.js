@@ -8,22 +8,14 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 // Try the environment variable, otherwise use root.
 const ASSET_PATH = process.env.ASSET_PATH || "/";
 
-// Set environment to development.
-//const __DEV__ = process.env.NODE_ENV !== "production" || true;
-
 module.exports = {
   entry: "./src/index.tsx",
-  // entry: [
-  //   // Conditionally include the mock definition file
-  //   __DEV__ && "./src/mock/browser.tsx",
-  //   // Include your application's entry
-  //   "./src/index.tsx",
-  // ].filter(Boolean),
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       filename: "./index.html",
       template: "./template.html",
+      hash: true,
     }),
     new MiniCssExtractPlugin({
       filename: "static/[name].[contenthash].css",
@@ -99,12 +91,4 @@ module.exports = {
       },
     ],
   },
-  // When importing a module whose path matches one of the following, just
-  // assume a corresponding global variable exists and use that instead.
-  // This is important because it allows us to avoid bundling all of our
-  // dependencies, which allows browsers to cache those libraries between builds.
-  // externals: {
-  //   react: "React",
-  //   "react-dom": "ReactDOM",
-  // },
 };

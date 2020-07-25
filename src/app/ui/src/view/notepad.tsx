@@ -24,7 +24,15 @@ function Page(): JSX.Element {
   const [notes, setNotes] = useState<Notes[]>([]);
   const [current, setCurrent] = useState<Current>({ message: "" });
 
-  const remoteNote = function (id: string) {
+  const getToken = function (): string {
+    let token = "";
+    if (cookie.auth && cookie.auth.accessToken) {
+      token = cookie.auth.accessToken;
+    }
+    return token;
+  };
+
+  const removeNote = function (id: string) {
     setNotes(
       notes.filter((v: Notes) => {
         return v.id !== id;
@@ -36,7 +44,7 @@ function Page(): JSX.Element {
     fetch("/api/v1/note", {
       method: "GET",
       headers: {
-        Authorization: "Bearer " + cookie.auth.accessToken,
+        Authorization: "Bearer " + getToken(),
       },
     })
       .then((response) => {
@@ -63,7 +71,7 @@ function Page(): JSX.Element {
     fetch("/api/v1/note", {
       method: "POST",
       headers: {
-        Authorization: "Bearer " + cookie.auth.accessToken,
+        Authorization: "Bearer " + getToken(),
         "Content-Type": "application/json",
       },
       body: JSON.stringify(current),
@@ -148,7 +156,7 @@ function Page(): JSX.Element {
                 onChange={(e: string) => {
                   note.message = e;
                 }}
-                remoteNote={remoteNote}
+                removeNote={removeNote}
               />
             ))}
           </ul>

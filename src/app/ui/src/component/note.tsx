@@ -5,10 +5,10 @@ import Debounce from "@/module/debounce";
 import { showFlash, messageType } from "@/component/flash";
 
 interface defaultProps {
-  id?: string;
+  id: string;
   message?: string;
   onChange: (e: string) => void;
-  removeNote?: (e: string) => void;
+  removeNote: (e: string) => void;
 }
 
 function View(props: defaultProps): JSX.Element {
@@ -16,11 +16,19 @@ function View(props: defaultProps): JSX.Element {
   const [saving, setSaving] = useState<string>("");
   const [message, setMessage] = useState<string>(props.message);
 
+  const getToken = function (): string {
+    let token = "";
+    if (cookie.auth && cookie.auth.accessToken) {
+      token = cookie.auth.accessToken;
+    }
+    return token;
+  };
+
   const update = function (id: string, text: string): void {
     fetch("/api/v1/note/" + id, {
       method: "PUT",
       headers: {
-        Authorization: "Bearer " + cookie.auth.accessToken,
+        Authorization: "Bearer " + getToken(),
         "Content-Type": "application/json",
       },
       body: JSON.stringify({ message: text }),
@@ -44,7 +52,7 @@ function View(props: defaultProps): JSX.Element {
     fetch("/api/v1/note/" + id, {
       method: "DELETE",
       headers: {
-        Authorization: "Bearer " + cookie.auth.accessToken,
+        Authorization: "Bearer " + getToken(),
       },
     })
       .then((response) => {
