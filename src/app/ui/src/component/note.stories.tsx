@@ -1,10 +1,11 @@
 import * as React from "react";
 import { useState } from "react";
-import { withKnobs, select } from "@storybook/addon-knobs";
+import { withKnobs, boolean, button } from "@storybook/addon-knobs";
 import { withA11y } from "@storybook/addon-a11y";
 import Note from "./note";
 import Flash from "@/component/flash";
-//import MockRequest from "@/module/mockrequest";
+import { rest } from "msw";
+import { worker } from "@/mock/browser";
 import "~/style/main.scss";
 
 export default {
@@ -14,33 +15,71 @@ export default {
 };
 
 export const note = (): JSX.Element => {
-  const s = select(
-    "Operation",
-    {
-      Success: "opt1",
-      Fail: "opt2",
-    },
-    "opt1"
-  );
-  switch (s) {
-    case "opt1":
-      //MockRequest.ok({});
-      break;
-    case "opt2":
-      //MockRequest.badRequest("There was an error.");
-      break;
-    default:
-    //MockRequest.badRequest("There is a problem with the storybook.");
-  }
-
-  // Set the state.
+  const shouldFail = boolean("Fail", false);
   const [state, setState] = useState<string>("");
+  const [visible, setVisible] = useState<boolean>(true);
+
+  button("Restore Note", function () {
+    setVisible(true);
+  });
+
+  const removeNote = function (id: string): void {
+    console.log("Remove note with id:", id);
+    setVisible(false);
+  };
+
+  worker.use(
+    ...[
+      rest.put("/api/v1/note/1", (req, res, ctx) => {
+        if (shouldFail) {
+          return res(
+            ctx.status(400),
+            ctx.json({
+              message: "There was an error.",
+            })
+          );
+        } else {
+          return res(
+            ctx.status(200),
+            ctx.json({
+              message: "ok",
+            })
+          );
+        }
+      }),
+      rest.delete("/api/v1/note/1", (req, res, ctx) => {
+        if (shouldFail) {
+          return res(
+            ctx.status(400),
+            ctx.json({
+              message: "There was an error.",
+            })
+          );
+        } else {
+          return res(
+            ctx.status(200),
+            ctx.json({
+              message: "ok",
+            })
+          );
+        }
+      }),
+    ]
+  );
 
   return (
     <main>
-      <ul>
-        <Note message={state} onChange={(e: string) => setState(e)} />
-      </ul>
+      {visible ? (
+        <ul>
+          <Note
+            id="1"
+            message={state}
+            onChange={(e: string) => setState(e)}
+            removeNote={removeNote}
+          />
+        </ul>
+      ) : null}
+
       <Flash />
     </main>
   );

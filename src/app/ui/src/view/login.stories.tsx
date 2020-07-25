@@ -6,8 +6,8 @@ import LayoutMain from "@/layout/main";
 import LoginPage from "@/view/login";
 import Flash from "@/component/flash";
 import { rest } from "msw";
-import "~/style/main.scss";
 import { worker } from "@/mock/browser";
+import "~/style/main.scss";
 
 export default {
   title: "View/Login",

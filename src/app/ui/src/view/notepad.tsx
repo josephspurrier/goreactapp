@@ -24,7 +24,7 @@ function Page(): JSX.Element {
   const [notes, setNotes] = useState<Notes[]>([]);
   const [current, setCurrent] = useState<Current>({ message: "" });
 
-  const remoteNote = function (id: string) {
+  const removeNote = function (id: string) {
     setNotes(
       notes.filter((v: Notes) => {
         return v.id !== id;
@@ -148,7 +148,7 @@ function Page(): JSX.Element {
                 onChange={(e: string) => {
                   note.message = e;
                 }}
-                remoteNote={remoteNote}
+                removeNote={removeNote}
               />
             ))}
           </ul>
