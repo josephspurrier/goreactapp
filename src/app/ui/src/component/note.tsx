@@ -30,11 +30,7 @@ function View(props: defaultProps): JSX.Element {
       body: JSON.stringify({ message: text }),
     })
       .then((response) => {
-        if (response.status === 200) {
-          response.json().then(function () {
-            showFlash("Note updated.", messageType.success);
-          });
-        } else {
+        if (response.status !== 200) {
           response.json().then(function (data) {
             showFlash(
               "Could not update note: " + data.message,

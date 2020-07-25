@@ -1,9 +1,12 @@
 import * as React from "react";
+import { useEffect, useState } from "react";
 import { navigate } from "hookrouter";
 import { useCookies } from "react-cookie";
 
 function View(): JSX.Element {
   const [cookie, , removeCookie] = useCookies(["auth"]);
+  const [shownNavClass, setShownNavClass] = useState<string>("");
+  const [shownMobileNavClass, setShownMobileNavClass] = useState<string>("");
 
   const clear = function (): void {
     removeCookie("auth", { path: "/" });
@@ -22,6 +25,17 @@ function View(): JSX.Element {
 
     return false;
   };
+
+  useEffect(() => {
+    // Close the nav menus when an item is clicked.
+    const links = document.querySelectorAll(".navbar-item");
+    links.forEach((link) => {
+      link.addEventListener("click", function () {
+        setShownNavClass("");
+        setShownMobileNavClass("");
+      });
+    });
+  }, []);
 
   return (
     <main>
@@ -44,15 +58,16 @@ function View(): JSX.Element {
           <a
             id="mobile-navbar-top"
             role="button"
-            className="navbar-burger burger"
+            className={"navbar-burger burger " + shownMobileNavClass}
             aria-label="menu"
             aria-expanded="false"
             data-target="navbar-top"
             onClick={() => {
-              const mob = document.getElementById("mobile-navbar-top");
-              const nav = document.getElementById("navbar-top");
-              mob.classList.toggle("is-active");
-              nav.classList.toggle("is-active");
+              if (shownMobileNavClass == "is-active") {
+                setShownMobileNavClass("");
+              } else {
+                setShownMobileNavClass("is-active");
+              }
             }}
           >
             <span aria-hidden="true"></span>
@@ -61,9 +76,18 @@ function View(): JSX.Element {
           </a>
         </div>
 
-        <div id="navbar-top" className="navbar-menu">
+        <div id="navbar-top" className={"navbar-menu " + shownMobileNavClass}>
           <div className="navbar-end">
-            <div className="navbar-item has-dropdown is-hoverable">
+            <div
+              id="ddmenu"
+              className={`navbar-item has-dropdown ` + shownNavClass}
+              onMouseEnter={() => {
+                setShownNavClass("is-active");
+              }}
+              onMouseLeave={() => {
+                setShownNavClass("");
+              }}
+            >
               <a className="navbar-link">Menu</a>
 
               <div className="navbar-dropdown is-right">
