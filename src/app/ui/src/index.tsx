@@ -15,11 +15,6 @@ function Root(): JSX.Element {
   return routeResult || <ErrorPage />;
 }
 
-// if (process.env.NODE_ENV === "development") {
-//   const { worker } = require("./mock/browser");
-//   worker.start();
-// }
-
 ReactDOM.render(
   <CookiesProvider>
     <MainLayout>
