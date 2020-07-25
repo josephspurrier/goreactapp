@@ -8,8 +8,17 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 // Try the environment variable, otherwise use root.
 const ASSET_PATH = process.env.ASSET_PATH || "/";
 
+// Set environment to development.
+//const __DEV__ = process.env.NODE_ENV !== "production" || true;
+
 module.exports = {
   entry: "./src/index.tsx",
+  // entry: [
+  //   // Conditionally include the mock definition file
+  //   __DEV__ && "./src/mock/browser.tsx",
+  //   // Include your application's entry
+  //   "./src/index.tsx",
+  // ].filter(Boolean),
   plugins: [
     new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({

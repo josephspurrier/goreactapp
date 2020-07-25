@@ -1,13 +1,13 @@
 import * as React from "react";
-//import { useState } from "react";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import { withKnobs, select, text } from "@storybook/addon-knobs";
+import { BrowserRouter as Router } from "react-router-dom";
+import { withKnobs, text, boolean } from "@storybook/addon-knobs";
 import { withA11y } from "@storybook/addon-a11y";
 import LayoutMain from "@/layout/main";
 import LoginPage from "@/view/login";
 import Flash from "@/component/flash";
-//import MockRequest from "@/module/mockrequest";
+import { rest } from "msw";
 import "~/style/main.scss";
+import { worker } from "@/mock/browser";
 
 export default {
   title: "View/Login",
@@ -16,28 +16,29 @@ export default {
 };
 
 export const Login = (): JSX.Element => {
-  // const s = select(
-  //   "Operation",
-  //   {
-  //     LoginSuccessful: "opt1",
-  //     LoginIncorrect: "opt2",
-  //   },
-  //   "opt1"
-  // );
-  // switch (s) {
-  //   case "opt1":
-  //     MockRequest.ok({});
-  //     break;
-  //   case "opt2":
-  //     MockRequest.badRequest("Login information does not match.");
-  //     break;
-  //   default:
-  //     MockRequest.badRequest("There is a problem with the storybook.");
-  // }
+  const shouldFail = boolean("Fail", false);
 
-  // Set the state.
-  // const [email, setEmail] = useState<string>("");
-  // const [password, setPassword] = useState<string>("");
+  worker.use(
+    ...[
+      rest.post("/api/v1/login", (req, res, ctx) => {
+        if (shouldFail) {
+          return res(
+            ctx.status(400),
+            ctx.json({
+              message: "There was an error.",
+            })
+          );
+        } else {
+          return res(
+            ctx.status(200),
+            ctx.json({
+              message: "Ok cool",
+            })
+          );
+        }
+      }),
+    ]
+  );
 
   return (
     <LayoutMain>
@@ -51,16 +52,3 @@ export const Login = (): JSX.Element => {
     </LayoutMain>
   );
 };
-
-// export const login = () => ({
-//   oninit: () => {},
-//   view: () => (
-//     <main>
-//       <LoginPage
-//         email={text("Email", "jsmith@example.com")}
-//         password={text("Password", "password")}
-//       />
-//       <Flash />
-//     </main>
-//   ),
-// });
