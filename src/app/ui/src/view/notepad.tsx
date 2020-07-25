@@ -24,6 +24,14 @@ function Page(): JSX.Element {
   const [notes, setNotes] = useState<Notes[]>([]);
   const [current, setCurrent] = useState<Current>({ message: "" });
 
+  const remoteNote = function (id: string) {
+    setNotes(
+      notes.filter((v: Notes) => {
+        return v.id !== id;
+      })
+    );
+  };
+
   const load = function () {
     fetch("/api/v1/note", {
       method: "GET",
@@ -140,6 +148,7 @@ function Page(): JSX.Element {
                 onChange={(e: string) => {
                   note.message = e;
                 }}
+                remoteNote={remoteNote}
               />
             ))}
           </ul>

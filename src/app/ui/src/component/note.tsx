@@ -8,17 +8,13 @@ interface defaultProps {
   id?: string;
   message?: string;
   onChange: (e: string) => void;
+  removeNote?: (e: string) => void;
 }
 
 function View(props: defaultProps): JSX.Element {
   const [cookie] = useCookies(["auth"]);
-  const [deleted, setDeleted] = useState<boolean>(false);
   const [saving, setSaving] = useState<string>("");
   const [message, setMessage] = useState<string>(props.message);
-
-  if (deleted) {
-    return null;
-  }
 
   const update = function (id: string, text: string): void {
     fetch("/api/v1/note/" + id, {
@@ -45,7 +41,6 @@ function View(props: defaultProps): JSX.Element {
   };
 
   const runDelete = function (id: string) {
-    setDeleted(true);
     fetch("/api/v1/note/" + id, {
       method: "DELETE",
       headers: {
@@ -56,6 +51,8 @@ function View(props: defaultProps): JSX.Element {
         if (response.status === 200) {
           response.json().then(function () {
             showFlash("Note deleted.", messageType.success);
+
+            props.removeNote(id);
           });
         } else {
           response.json().then(function (data) {
