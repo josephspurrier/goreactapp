@@ -12,7 +12,7 @@ cd $GOPATH/src/app
 docker build -t goreactapp:1.0 .
 
 # Run the app docker container.
-docker run -d -p 8081:8081 -e MYSQL_HOST=host.docker.internal -e MYSQL_ROOT_PASSWORD=password --rm --name gomithrilapp-api gomithrilapp-api:1.0
+docker run -d -p 8081:8081 -e MYSQL_HOST=host.docker.internal -e MYSQL_ROOT_PASSWORD=password --rm --name goreactapp-api goreactapp-api:1.0
 
 # Create the database.
 docker exec mysql57 sh -c 'exec mysql -u root -ppassword -e "CREATE DATABASE IF NOT EXISTS main DEFAULT CHARSET = utf8mb4 COLLATE = utf8mb4_unicode_ci;"'
