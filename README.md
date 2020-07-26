@@ -6,7 +6,7 @@
 
 [![Swagger Validator](https://online.swagger.io/validator?url=https://raw.githubusercontent.com/josephspurrier/goreactapp/master/src/app/ui/static/swagger.json)](https://petstore.swagger.io/?url=https://raw.githubusercontent.com/josephspurrier/goreactapp/master/src/app/ui/static/swagger.json)
 
-This is a sample notepad application that uses React on the front-end (UI) and Go on the back-end (API). This project is designed to show good development and CI/CD practices as well as integrations between modern development tools.
+This is a sample notepad application that uses React with TypeScript on the front-end (UI) and Go on the back-end (API). This project is designed to show good development and CI/CD practices as well as integrations between modern development tools.
 
 This project uses a [Makefile](Makefile) to centralize frequently used commands. The code coverage badge above is only for the back-end API - not the front-end.
 
@@ -22,7 +22,8 @@ This is one repository of a few that demonstrate with different front-end framew
 
 - [Vue and Go](https://github.com/josephspurrier/govueapp)
 - [Mithril and Go](https://github.com/josephspurrier/gomithrilapp)
-- [React and Go](https://github.com/josephspurrier/goreactapp)
+- [Mithril (TypeScript) and Go](https://github.com/josephspurrier/gomithriltsapp)
+- [React (TypeScript) and Go](https://github.com/josephspurrier/goreactapp)
 
 You can reference some off the documention here, though it's specific to Mithril:
 https://josephspurrier.github.io/gomithrilapp/
