@@ -18,12 +18,11 @@ To test the application locally, you can follow these [instructions](https://jos
 
 ## Additional Documentation
 
-Below are links to various section of the documentation.
+This is one repository of a few that demonstrate with different front-end frameworks how to build a notepad application with authentication. A few of the other repositories are:
 
-- [Environment Preparation](https://josephspurrier.github.io/goreactapp/docs/tutorial/env-prep)
-- [Database](https://josephspurrier.github.io/goreactapp/docs/database)
-- [Front-End](https://josephspurrier.github.io/goreactapp/docs/front-end)
-- [Back-End](https://josephspurrier.github.io/goreactapp/docs/back-end)
-- [Swagger](https://josephspurrier.github.io/goreactapp/docs/swagger)
-- [Docker Compose](https://josephspurrier.github.io/goreactapp/docs/docker-compose)
-- [Documentation](https://josephspurrier.github.io/goreactapp/docs/documentation)
+- [Vue and Go](https://github.com/josephspurrier/govueapp)
+- [Mithril and Go](https://github.com/josephspurrier/gomithrilapp)
+- [React and Go](https://github.com/josephspurrier/goreactapp)
+
+You can reference some off the documention here, though it's specific to Mithril:
+https://josephspurrier.github.io/gomithrilapp/
