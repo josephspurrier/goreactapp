@@ -9,7 +9,7 @@ docker run -d -p 3306:3306 -e MYSQL_ROOT_PASSWORD=password --rm --name mysql57 m
 cd $GOPATH/src/app
 
 # Build the docker container.
-docker build -t gomithrilapp:1.0 .
+docker build -t goreactapp:1.0 .
 
 # Run the app docker container.
 docker run -d -p 8081:8081 -e MYSQL_HOST=host.docker.internal -e MYSQL_ROOT_PASSWORD=password --rm --name gomithrilapp-api gomithrilapp-api:1.0

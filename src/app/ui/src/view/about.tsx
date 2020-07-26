@@ -4,7 +4,7 @@ import SimplePage from "@/component/simple-page";
 function content(): JSX.Element {
   return (
     <main>
-      This shows you how to build a website using <strong>Mithril</strong>,{" "}
+      This shows you how to build a website using <strong>React</strong>,{" "}
       <strong>Go</strong>, and <strong>Bulma </strong>
     </main>
   );

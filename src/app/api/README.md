@@ -1,6 +1,6 @@
-# gomithrilapp
+# goreactapp
 
-> Sample notepad application in Mithril and Go.
+> Sample notepad application in React and Go.
 
 ## Build Setup
 
